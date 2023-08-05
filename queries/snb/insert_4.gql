@@ -1,0 +1,14 @@
+MATCH
+    (p:Person {id: moderatorId})
+INSERT
+    (f Forum {id: forumId, title: $forumTitle, creationDate: $creationDate})
+    -[hasModerator]->
+    (p)
+RETURN
+    f
+
+NEXT
+
+FOR tagId IN $tagIds
+MATCH (t:Tag {id: tagId})
+INSERT (f)-[hasTag]->(t);

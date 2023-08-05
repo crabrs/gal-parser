@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+  <div id="root"></div>
+</body>
+<!-- This setup is not suitable for production. -->
+<!-- Only use it in development! -->
+<script src="https://gw.alipayobjects.com/os/lib/antv/g6/4.8.17/dist/g6.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://ga.jspm.io/npm:es-module-shims@1.7.0/dist/es-module-shims.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react?dev",
+    "react-dom/client": "https://esm.sh/react-dom/client?dev"
+  }
+}
+</script>
+<script type="text/babel" data-type="module">
+  import React, { StrictMode } from 'react';
+  import { createRoot } from 'react-dom/client';
+
+  function makeid(length) {
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < length) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    return result;
+  }
+
+  function parse(gql) {
+    fetch('http://localhost:3000/parse', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        gql: gql
+      })
+    })
+      .then((res) => {
+        if (res.ok) {
+          return res.json().then((result) => {
+            let elapsed = result.elapsed;
+            okMessageShow(`Ok. Parsing elapsed: ${elapsed}`)
+            let parse_tree = result.parse_tree;
+            const container = document.getElementById('container');
+            const width = container.scrollWidth;
+            const height = container.scrollHeight || 500;
+            const graph = new G6.TreeGraph({
+              container: 'container',
+              width,
+              height,
+              linkCenter: true,
+              modes: {
+                default: [
+                  {
+                    type: 'collapse-expand',
+                    onChange: function onChange(item, collapsed) {
+                      const data = item.getModel();
+                      data.collapsed = collapsed;
+                      return true;
+                    },
+                  },
+                  'drag-canvas',
+                  'zoom-canvas',
+                  'drag-node',
+                ],
+              },
+              defaultNode: {
+                type: 'rect',
+                size: [0, 0],
+              },
+              defaultEdge: {
+                type: 'cubic-vertical',
+              },
+              layout: {
+                type: 'compactBox',
+                direction: 'TB',
+                getId: function getId(d) {
+                  return d.id;
+                },
+                getHeight: function getHeight() {
+                  return 24;
+                },
+                getWidth: function getWidth() {
+                  return 24;
+                },
+                getVGap: function getVGap() {
+                  return 20;
+                },
+                getHGap: function getHGap() {
+                  return 120;
+                },
+              },
+            });
+
+            graph.node(function (node) {
+              let position = 'right';
+              let label = node.rule;
+              if (!node.children) {
+                position = 'bottom';
+                label = `${node.rule}"${node.term}"`;
+              }
+              return {
+                label,
+                // labelCfg: {
+                //   position,
+                //   offset: 5,
+                //   style: {
+                //     textAlign: 'start',
+                //   },
+                // },
+              };
+            });
+
+            graph.data(parse_tree);
+            graph.render();
+            graph.fitView();
+
+            if (typeof window !== 'undefined')
+              window.onresize = () => {
+                if (!graph || graph.get('destroyed')) return;
+                if (!container || !container.scrollWidth || !container.scrollHeight) return;
+                graph.changeSize(container.scrollWidth, container.scrollHeight);
+              };
+
+          });
+        } else {
+          return res.json().then((data) => {
+            errorMessageShow(data.err_msg);
+          });
+        }
+      })
+      .catch((err) => {
+        errorMessageShow(err);
+      });
+
+  }
+
+  function ParseButton() {
+    return (
+      <button onClick={startParse}>
+        Start Parsing
+      </button>
+    );
+  }
+
+  function errorMessageShow(msg) {
+    const messageArea = document.getElementById("messageArea");
+    messageArea.style.color = '#dc143c';
+    messageArea.value = msg;
+  }
+
+  function okMessageShow(msg) {
+    const messageArea = document.getElementById("messageArea");
+    messageArea.style.color = '#008000';
+    messageArea.value = msg;
+  }
+
+  function startParse() {
+    const gql = document.getElementById("gqlTextArea").value;
+    okMessageShow(''); // clear error message
+    parse(gql);
+  }
+
+  let App = function MyApp() {
+    return (
+      <div>
+        <h1>Welcome to GQL parser workbench</h1>
+
+        <div className="container-wrapper">
+          <div className="left" >
+            <ParseButton />
+            <textarea defaultValue='MATCH (n) RETURN n' id="gqlTextArea" rows="36" cols="50"></textarea>
+            <textarea defaultValue='' id="messageArea" rows="16" cols="50" readOnly></textarea>
+          </div>
+          
+          <div id="container" style={{ border: '1px solid', width: '72%', height: '84vh' }}></div>
+        </div>
+      </div>
+    );
+  }
+
+
+  const root = createRoot(document.getElementById('root'));
+  root.render(
+    <StrictMode>
+      <App />
+    </StrictMode>
+  );
+</script>
+<style>
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: sans-serif;
+    margin: 20px;
+    padding: 0;
+  }
+
+  h1 {
+    margin-top: 0;
+    font-size: 22px;
+  }
+
+  h2 {
+    margin-top: 0;
+    font-size: 20px;
+  }
+
+  h3 {
+    margin-top: 0;
+    font-size: 18px;
+  }
+
+  h4 {
+    margin-top: 0;
+    font-size: 16px;
+  }
+
+  h5 {
+    margin-top: 0;
+    font-size: 14px;
+  }
+
+  h6 {
+    margin-top: 0;
+    font-size: 12px;
+  }
+
+  code {
+    font-size: 1.2em;
+  }
+
+  ul {
+    padding-left: 20px;
+  }
+
+  .container-wrapper {
+    display: flex;
+    justify-content: space-around
+  }
+
+  .left {
+    display: flex;
+    flex-direction: column;
+    height: 84vh; 
+  }
+</style>
+
+</html>

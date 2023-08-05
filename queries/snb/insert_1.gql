@@ -1,0 +1,40 @@
+MATCH (c:City {id: $cityId})
+INSERT (p Person {
+    id: $personId,
+    firstName: $personFirstName,
+    lastName: $personLastName,
+    gender: $gender,
+    birthday: $birthday,
+    creationDate: $creationDate,
+    locationIP: $locationIP,
+    browserUsed: $browserUsed,
+    languages: $languages,
+    email: $emails
+})-[isLocatedIn]->(c)
+RETURN
+    p,
+    count(*) AS dummy1
+
+NEXT
+
+FOR tagId IN $tagIds
+MATCH (t:Tag {id: tagId})
+INSERT (p)-[hasInterest]->(t)
+RETURN
+    p,
+    count(*) AS dummy2
+
+NEXT
+
+FOR s IN $studyAt
+MATCH (u:University {id: s.id})
+INSERT (p)-[studyAt {classYear: s.classYear}]->(u)
+RETURN
+    p,
+    count(*) AS dummy3
+
+NEXT
+
+FOR w IN $workAt
+MATCH (comp:Company {id: w.id})
+INSERT (p)-[workAt {workFrom: w.workFrom}]->(comp);

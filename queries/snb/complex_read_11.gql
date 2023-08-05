@@ -1,0 +1,20 @@
+MATCH (person:Person {id: $personId})-[:knows]-{1,2}(otherPerson:Person)
+RETURN DISTINCT
+    otherPerson
+
+NEXT
+
+MATCH (otherPerson)-[workAt:workAt WHERE workAt.workFrom < $year]->(company:Company)
+    -[:isLocatedIn]->
+    (country:Country {name: $name})
+RETURN
+    otherPerson.id AS personId,
+    otherPerson.firstName AS personFirstName,
+    otherPerson.lastName AS personLastName,
+    company.name AS orgnaizationName,
+    workAt.workFrom AS organizationWorkFromYear
+ORDER BY
+    organizationWorkFromYear ASC,
+    CAST(personId AS INTEGER) ASC,
+    orgnaizationName DESC
+LIMIT 10;

@@ -1,0 +1,5 @@
+MATCH (message:Message {id: $messageId})-[:hasCreator]->(person:Person)
+RETURN
+    person.id AS personId,
+    person.firstName AS firstName,
+    person.lastName AS lastName;

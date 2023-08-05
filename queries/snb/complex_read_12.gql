@@ -1,0 +1,16 @@
+MATCH (person:Person {id: $personId})-[:knows]-(friend:Person)
+    <-[:hasCreator]-
+    (comment:Comment)-[:replyOf]->(:Post)
+    -[:hasTag]->
+    (tag:Tag)-[:hasType]->(:TagClass)
+    -[:isSubClassOf]->*(tagClass:TagClass {name: $tagClassName})
+RETURN
+    friend.id AS personId,
+    friend.firstName AS personFirstName,
+    friend.lastName AS personLastName,
+    collect_list(DISTINCT tag.name) AS tagNames,
+    collect_list(DISTINCT comment) AS replyCount
+ORDER BY
+    replyCount DESC,
+    CAST(personId AS int) ASC
+LIMIT 20;

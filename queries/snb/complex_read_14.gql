@@ -1,0 +1,8 @@
+MATCH p = (person1:Person {id: $person1Id})-[:knows]-*(person2:Person {id: $person2Id})
+CALL pog.pathlib.reduce(p) YIELD result
+RETURN
+    result.nodeIds AS personIdsInPath,
+    min(result.pathWeight) AS pathWeight
+GROUP BY
+    personIdsInPath;
+

@@ -1,0 +1,4 @@
+MATCH (message: Message {id: $messageId})
+RETURN
+    message.creationDate as messageCreationDate,
+    coalesce(m.content, m.imageFile) as messageContent

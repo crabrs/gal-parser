@@ -1,0 +1,4 @@
+MATCH
+    (:Comment {id: $commentId})*<-[:replyOf]-(comment:Comment)
+DETACH DELETE comment
+RETURN count(*);

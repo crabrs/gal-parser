@@ -1,0 +1,25 @@
+[package]
+name = "gql-parser"
+authors = ["antkiller996 <eadrenking@outlook.com>"]
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+members = ["browser"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+pest = "2.7"
+pest_derive = "2.7"
+
+[dev-dependencies]
+criterion = "0.5.1"
+
+[[bench]]
+name = "queries"
+harness = false
+
+[profile.release]
+opt-level = 3
+lto = true

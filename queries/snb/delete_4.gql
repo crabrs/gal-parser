@@ -1,0 +1,6 @@
+MATCH
+    (forum:Forum {id: $forumId})
+OPTIONAL MATCH
+    (forum)-[:containerOf]->(:Post)*<-[:replyOf]-(message:Message)
+DETACH DELETE forum, message
+RETURN count(*);

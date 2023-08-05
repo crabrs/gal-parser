@@ -1,0 +1,24 @@
+MATCH
+    (author:Person {id: $authorPersonId}),
+    (country:Country {id: $countryId}),
+    (forum:Forum {id: $forumId})
+INSERT
+    (author)<-[hasCreator]-(p Post&Message {
+        id: $postId,
+        creationDate: $creationDate,
+        locationIP: $locationIP,
+        browserUsed: $browserUsed,
+        language: $language,
+        content: CASE $content WHEN '' THEN NULL ELSE $content END,
+        imageFile: CASE $imageFile WHEN '' THEN NULL ELSE $imageFile END,
+        length: $length
+    })<-[containerOf]-(forum),
+    (p)-[isLocatedIn]->(country)
+RETURN
+    p
+
+NEXT
+
+FOR tagId IN $tagIds
+MATCH (t:Tag {id: tagId})
+INSERT (p)-[hasTag]->(t);

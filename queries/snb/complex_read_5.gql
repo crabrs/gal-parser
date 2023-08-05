@@ -1,0 +1,21 @@
+MATCH
+    (person:Person {id: $personId})-[:knows]-{1,2}(otherPerson:Person)
+RETURN DISTINCT
+    otherPerson
+
+NEXT
+
+OPTIONAL MATCH
+    (otherPerson)
+    <-[membership:hashMember WHERE $minDate < membership.creationDate]-
+    (forum:Forum)
+    -[:containerOf]->(post:Post)-[:hasCreator]->
+    (otherPerson)
+RETURN
+    forum.title AS forumTitle,
+    count(post) AS postCount
+ORDER BY
+    postCount DESC,
+    forum.id ASC
+LIMIT 20;
+    

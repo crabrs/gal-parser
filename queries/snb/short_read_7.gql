@@ -1,0 +1,16 @@
+MATCH (message:Message {id: $messageId})<-[:replyOf]-(comment:Comment)-[:hasCreator]->(replyAuthor:Person)
+OPTIONAL MATCH (message)-[:hasCreator]->(messageAuthor:Person)-[:knows]-(replyAuthor)
+RETURN
+    comment.id AS commentId,
+    comment.content AS commentContent,
+    comment.creationDate AS commentCreationDate,
+    replyAuthor.id AS replyAuthorId,
+    replyAuthor.firstName AS replyAuthorFirstName,
+    replyAuthor.lastName AS replyAuthorLastName,
+    CASE
+        WHEN knows IS NULL THEN false
+        ELSE true
+    END AS replyAuthorKnowsOriginalMessageAuthor
+ORDER BY
+    comment.creationDate DESC,
+    replyAuthorId;

@@ -1,0 +1,2 @@
+MATCH (f:Forum {id: $forumId}), (p:Person {id: $personId})
+INSERT (f)-[hasMember {creationDate: $creationDate}]->(p);

@@ -1,0 +1,7 @@
+MATCH (m:Message {id: $messageId})-[replyOf]->*(:Post)<-[:containerOf]-(forum:Forum)-[:hasModerator]->(moderator:Person)
+RETURN
+    forum.id AS forumId,
+    forum.title AS forumTitle,
+    moderator.id AS moderatorId,
+    moderator.firstName AS moderatorFirstName,
+    moderator.lastName AS moderatorLastName;

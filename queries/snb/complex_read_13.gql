@@ -1,0 +1,7 @@
+MATCH
+    p = ANY SHORTEST SIMPLE PATH (:Person {id: $person1Id})-[:knows]-*(:Person {id: $person2Id})
+RETURN
+    CASE p
+        WHEN IS NULL THEN -1
+        ELSE path_length(p)
+    END AS shortestPathLength;

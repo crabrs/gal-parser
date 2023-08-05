@@ -1,0 +1,4 @@
+MATCH
+    (:Person {id: $person1Id})-[k:knows]-(:Person {id: $person2Id})
+DELETE k
+RETURN count(*);

@@ -1,0 +1,2 @@
+MATCH (person:Person {id: $personId}), (comment:Comment {id: $commentId})
+INSERT (person)-[likes {creationDate: $creationDate}]->(comment);

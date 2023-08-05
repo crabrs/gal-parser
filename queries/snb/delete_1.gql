@@ -1,0 +1,14 @@
+MATCH
+    (person:Person {id: $personId})
+OPTIONAL MATCH
+    (person)<-[:hasCreator]-(:Message)*<-[:replyOf]-(message1:Message)
+OPTIONAL MATCH
+    (person)<-[:hasModerator]-(forum:Forum)
+WHERE
+    left(forum.title, 6) = 'Album ' OR left(forum.title, 5) = 'Wall '
+OPTIONAL MATCH
+    (forum)-[:containerOf]->(:Post)*<-[:replyOf]-(message2:Message)
+DETACH DELETE
+    person, forum, message1, message2
+RETURN
+    count(*);

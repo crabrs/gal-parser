@@ -1,0 +1,2 @@
+MATCH (person:Person {id: $personId}), (post:Post {id: $postId})
+INSERT (person)-[likes {creationDate: $creationDate}]->(post);

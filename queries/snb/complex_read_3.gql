@@ -1,0 +1,22 @@
+MATCH SIMPLE PATH
+    (person:Person {id: $personId})-[:knows]-{1,2}(friend:Person)
+    <-[:hasCreator]-
+    (message:Message WHERE DURATION_BETWEEN(message.creationDate, $startDate) >= 0 AND DURATION_BETWEEN(message.creationDate, $startDate) < $durationDays)
+    -[:isLocated]->
+    (country:Country WHERE name = $countryXName OR name = $countryYName)
+WHERE NOT EXISTS ((friend)-[:isLocatedIn]->(:City)-[:isPartOf]->(country))
+RETURN
+    friend.id AS friendId,
+    friend.firstName AS friendFirstName,
+    friend.lastName AS friendLastName,
+    sum(
+        CASE WHEN country.name = $countryXName THEN 1 ELSE 0 END
+    ) AS xCount,
+    sum(
+        CASE WHEN country.name = $countryYName THEN 1 ELSE 0 END
+    ) AS yCount,
+    xCount + yCount AS totalCount
+ORDER BY
+    totalCount DESC,
+    friendId ASC
+LIMIT 20;

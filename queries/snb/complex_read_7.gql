@@ -1,0 +1,37 @@
+MATCH (person:Person {id: $personId})<-[:hasCreator]-(message:Message)<-[:likes]-(liker:Person)
+RETURN
+    liker,
+    message,
+    likes.creationDate AS likeTime,
+    person
+ORDER BY
+    likeTime DESC,
+    CAST(message.id AS INTEGER) ASC
+
+NEXT
+
+RETURN
+    liker,
+    trim(collect_list({msg: message, likeTime: likeTime}), 1) AS latestLike,
+    person
+
+NEXT
+
+RETURN
+    liker.id AS personId,
+    liker.firstName AS personFirstName,
+    liker.lastName AS personLastName,
+    latestLike.likeTime AS likeCreationDate,
+    latestLike.msg.id AS commentOrPostId,
+    coalesce(latestLike.msg.content, latestLike.msg.imageFile) AS commentOrPostContent,
+    CAST(
+        floor(
+            CAST(latestLike.likeTime - latestLike.msg.creationDate AS float)/1000.0
+        )/60.0
+        AS INTEGER
+    ) AS minutesLatency,
+    NOT EXISTS((liker)-[:knows]-(person)) AS isNew
+ORDER BY
+    likeCreationDate DESC,
+    CAST(personId AS INTEGER) ASC
+LIMIT 20;

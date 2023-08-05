@@ -1,0 +1,10 @@
+MATCH (person:Person {id: $personId})-[:isLocatedIn]->(city:City)
+RETURN
+    person.firstName AS personFirstName,
+    person.lastName AS personLastName,
+    person.birthday AS personBirthday,
+    person.locationIP AS personLocationIP,
+    person.browserUsed AS personBrowserUsed,
+    city.id AS cityId,
+    person.gender AS personGender,
+    person.creationDate AS personCreationDate;

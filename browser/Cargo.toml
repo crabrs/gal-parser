@@ -1,0 +1,15 @@
+[package]
+name = "gql-parser-browser"
+authors = ["antkiller996 <eadrenking@outlook.com>"]
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+axum = "0.6.19"
+serde = "1.0.174"
+serde_json = "1.0.103"
+tokio = { version = "1.29.1", features = ["macros", "rt-multi-thread"] }
+gql-parser ={ path = "..", version = "0.1.0" }
+pest = "2.7"

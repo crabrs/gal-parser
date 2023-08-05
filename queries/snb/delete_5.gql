@@ -1,0 +1,4 @@
+MATCH
+    (:Forum {id: $forumId})-[membership:hasMember]->(:Person {id: $personId})
+DELETE membership
+RETURN count(*);

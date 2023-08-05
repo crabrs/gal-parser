@@ -1,0 +1,12 @@
+MATCH (:Person {id: $personId})-[:knows]-(friend:Person)<-[:hasCreator]-(message:Message WHERE message.creationDate < $maxDate)
+RETURN
+    friend.id AS personId,
+    friend.firstName AS personFirstName,
+    friend.lastName AS personLastName,
+    message.id AS postOrCommentId,
+    coalesce(message.content,message.imageFile) AS postOrCommentContent,
+    message.creationDate AS postOrCommentCreationDate
+ORDER BY
+    postOrCommentCreationDate DESC,
+    CAST(postOrCommentId AS INTEGER) ASC
+LIMIT 20;

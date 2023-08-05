@@ -1,0 +1,49 @@
+MATCH (person:Person {id: $personId})-[:knows]-{2}(foaf:Person)-[:isLocatedIn]->(city:City)
+WHERE NOT EXISTS ((person)-[:knows]->(foaf))
+RETURN
+    person,
+    city,
+    foaf,
+    local_datetime({epochMillis: foaf.birthday}) AS birthday
+
+NEXT
+
+FILTER WHERE
+    (birthday.month = $month AND birthday.day >= 21)
+    OR
+    (birthday.month = mod($month, 12)+1 AND birthday.day < 22)
+RETURN DISTINCT
+    foaf,
+    city,
+    person
+
+NEXT
+
+OPTIONAL MATCH (foaf)-[:hasCreator]->(post:Post)
+RETURN
+    foaf,
+    city,
+    count(post) AS postCount,
+    count(
+        CASE
+            WHEN EXISTS ((post)-[:hasTag]->()<-[:hasInterest]-(person)) THEN 1
+            ELSE 0
+        END
+    ) AS commentPostCount
+GROUP BY
+    foaf,
+    city
+
+NEXT
+
+RETURN
+    foaf.id AS personId,
+    foaf.firstName AS personFirstName,
+    foaf.lastName AS personLastName,
+    commonPostCount - (postCount - commonPostCount) AS commonInterestScore,
+    foaf.gender AS personGender,
+    city.name AS personCityName
+ORDER BY
+    commonInterestScore DESC,
+    personId ASC
+LIMIT 10;
