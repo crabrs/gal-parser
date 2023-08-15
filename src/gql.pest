@@ -1587,8 +1587,8 @@ predefined_parameter = { ^"CURRENT_USER" }
 value_expression = { common_value_expression | boolean_value_expression }
 
 common_value_expression = {
-  duration_value_expression
-  | numeric_value_expression
+  numeric_value_expression
+  | duration_value_expression
   | string_value_expression
   | datetime_value_expression
   | list_value_expression
