@@ -2118,7 +2118,7 @@ element_id_function = {
   ^"ELEMENT_ID" ~ left_paren ~ element_variable_reference ~ right_paren
 }
 
-// ---------------------------- 20.25 <let value function> ------------------------------
+// ---------------------------- 20.25 <let value expression> ------------------------------
 let_value_expression = {
   ^"LET" ~ let_variable_definition_list ~ ^"IN" ~ value_expression ~ ^"END"
 }
