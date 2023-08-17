@@ -457,7 +457,7 @@ ambient_linear_query_statement = {
   | nested_query_specification
 }
 
-simple_linear_query_statement = { simple_query_statement }
+simple_linear_query_statement = { simple_query_statement+ }
 
 simple_query_statement = { primitive_query_statement | call_query_statement }
 
