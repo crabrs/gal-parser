@@ -134,11 +134,13 @@ nested_procedure_specification = {
   left_brace ~ procedure_specification ~ right_brace
 }
 
-procedure_specification = {
-  catalog_modifying_procedure_specification
-  | data_modifying_procedure_specification
-  | query_specification
-}
+// procedure_specification = {
+//   catalog_modifying_procedure_specification
+//   | data_modifying_procedure_specification
+//   | query_specification
+// }
+procedure_specification = { procedure_body }
+
 
 catalog_modifying_procedure_specification = { procedure_body }
 
